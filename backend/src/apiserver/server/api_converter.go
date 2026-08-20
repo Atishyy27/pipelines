@@ -2428,9 +2428,9 @@ func toModelStorageState(s interface{}) (model.StorageState, error) {
 	if s == nil {
 		return model.StorageStateUnspecified, nil
 	}
-	switch s.(type) {
-	case string, *string:
-		state := s.(string)
+	switch v := s.(type) {
+	case string:
+		state := v
 		switch state {
 		case string(model.StorageStateArchived), string(model.StorageStateArchived.ToV1()):
 			return model.StorageStateArchived, nil
@@ -2441,14 +2441,39 @@ func toModelStorageState(s interface{}) (model.StorageState, error) {
 		default:
 			return "", util.NewInternalServerError(util.NewInvalidInputError("Storage state cannot be equal to %v", s), "Failed to convert API storage state to its internal representation")
 		}
-	case apiv1beta1.Run_StorageState, *apiv1beta1.Run_StorageState:
-		return toModelStorageState(apiv1beta1.Run_StorageState_name[int32(s.(apiv1beta1.Run_StorageState))])
-	case apiv1beta1.Experiment_StorageState, *apiv1beta1.Experiment_StorageState:
-		return toModelStorageState(apiv1beta1.Experiment_StorageState_name[int32(s.(apiv1beta1.Experiment_StorageState))])
-	case apiv2beta1.Run_StorageState, *apiv2beta1.Run_StorageState:
-		return toModelStorageState(apiv2beta1.Run_StorageState_name[int32(s.(apiv2beta1.Run_StorageState))])
-	case apiv2beta1.Experiment_StorageState, *apiv2beta1.Experiment_StorageState:
-		return toModelStorageState(apiv2beta1.Experiment_StorageState_name[int32(s.(apiv2beta1.Experiment_StorageState))])
+	case *string:
+		if v == nil {
+			return model.StorageStateUnspecified, nil
+		}
+		return toModelStorageState(*v)
+	case apiv1beta1.Run_StorageState:
+		return toModelStorageState(apiv1beta1.Run_StorageState_name[int32(v)])
+	case *apiv1beta1.Run_StorageState:
+		if v == nil {
+			return model.StorageStateUnspecified, nil
+		}
+		return toModelStorageState(*v)
+	case apiv1beta1.Experiment_StorageState:
+		return toModelStorageState(apiv1beta1.Experiment_StorageState_name[int32(v)])
+	case *apiv1beta1.Experiment_StorageState:
+		if v == nil {
+			return model.StorageStateUnspecified, nil
+		}
+		return toModelStorageState(*v)
+	case apiv2beta1.Run_StorageState:
+		return toModelStorageState(apiv2beta1.Run_StorageState_name[int32(v)])
+	case *apiv2beta1.Run_StorageState:
+		if v == nil {
+			return model.StorageStateUnspecified, nil
+		}
+		return toModelStorageState(*v)
+	case apiv2beta1.Experiment_StorageState:
+		return toModelStorageState(apiv2beta1.Experiment_StorageState_name[int32(v)])
+	case *apiv2beta1.Experiment_StorageState:
+		if v == nil {
+			return model.StorageStateUnspecified, nil
+		}
+		return toModelStorageState(*v)
 	default:
 		return "", util.NewUnknownApiVersionError("StorageState", s)
 	}
@@ -2531,11 +2556,21 @@ func toModelRuntimeState(s interface{}) (model.RuntimeState, error) {
 	if s == nil {
 		return model.RuntimeStateUnspecified, nil
 	}
-	switch s := s.(type) {
-	case string, *string:
-		return model.RuntimeState(s.(string)), nil
-	case apiv2beta1.RuntimeState, *apiv2beta1.RuntimeState:
-		return toModelRuntimeState(apiv2beta1.RuntimeState_name[int32(s.(apiv2beta1.RuntimeState))])
+	switch v := s.(type) {
+	case string:
+		return model.RuntimeState(v), nil
+	case *string:
+		if v == nil {
+			return model.RuntimeStateUnspecified, nil
+		}
+		return toModelRuntimeState(*v)
+	case apiv2beta1.RuntimeState:
+		return toModelRuntimeState(apiv2beta1.RuntimeState_name[int32(v)])
+	case *apiv2beta1.RuntimeState:
+		if v == nil {
+			return model.RuntimeStateUnspecified, nil
+		}
+		return toModelRuntimeState(*v)
 	default:
 		return "", util.NewUnknownApiVersionError("RuntimeState", s)
 	}

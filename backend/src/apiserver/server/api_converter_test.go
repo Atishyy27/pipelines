@@ -2511,6 +2511,51 @@ func TestToApiRecurringRun(t *testing.T) {
 	assert.Equal(t, expectedRecurringRun2.String(), apiRecurringRun2.String())
 }
 
+func Test_toModelState_pointerInputs(t *testing.T) {
+	archived := string(model.StorageStateArchived)
+	storageEnum := apiv1beta1.Run_STORAGESTATE_ARCHIVED
+	running := string(model.RuntimeStateRunning)
+	runtimeEnum := apiv2beta1.RuntimeState_RUNNING
+
+	t.Run("storage state pointer matches value", func(t *testing.T) {
+		wantStr, err := toModelStorageState(archived)
+		assert.Nil(t, err)
+		gotStr, err := toModelStorageState(&archived)
+		assert.Nil(t, err)
+		assert.Equal(t, wantStr, gotStr)
+
+		wantEnum, err := toModelStorageState(storageEnum)
+		assert.Nil(t, err)
+		gotEnum, err := toModelStorageState(&storageEnum)
+		assert.Nil(t, err)
+		assert.Equal(t, wantEnum, gotEnum)
+	})
+
+	t.Run("runtime state pointer matches value", func(t *testing.T) {
+		wantStr, err := toModelRuntimeState(running)
+		assert.Nil(t, err)
+		gotStr, err := toModelRuntimeState(&running)
+		assert.Nil(t, err)
+		assert.Equal(t, wantStr, gotStr)
+
+		wantEnum, err := toModelRuntimeState(runtimeEnum)
+		assert.Nil(t, err)
+		gotEnum, err := toModelRuntimeState(&runtimeEnum)
+		assert.Nil(t, err)
+		assert.Equal(t, wantEnum, gotEnum)
+	})
+
+	t.Run("typed nil pointer is not a panic", func(t *testing.T) {
+		gotStorage, err := toModelStorageState((*string)(nil))
+		assert.Nil(t, err)
+		assert.Equal(t, model.StorageStateUnspecified, gotStorage)
+
+		gotRuntime, err := toModelRuntimeState((*string)(nil))
+		assert.Nil(t, err)
+		assert.Equal(t, model.RuntimeStateUnspecified, gotRuntime)
+	})
+}
+
 func Test_toModelRuntimeState(t *testing.T) {
 	tests := []struct {
 		name     string
